@@ -1,0 +1,42 @@
+---
+- name: bootstrapping and new user
+  hosts: raiders
+  connection: ssh   # default connection method (use OpenSSH)
+  gather_facts: False
+
+  tasks:
+
+  # update the apt catalog
+  - name: "Ensure apt is updated"
+    ansible.builtin.raw: "apt update -y"
+    become: yes
+
+  # install Python with ansible
+  # the raw module will ALWAYS issue your command
+  # no idempotence here!
+  # therefore, use it sparingly!!
+  - name: "Bootstrap python install"
+    ansible.builtin.raw: "apt install -y python3-pip"
+    become: yes
+
+  # create a new group
+  - name: Create the new group sandbox
+    ansible.builtin.group:
+      name: sandbox
+      state: present
+    become: yes
+
+  # create new user on target system
+  - name: Add user 'exampleuser' with group of 'sandbox'
+    ansible.builtin.user:
+      name: exampleuser
+      comment: "Example User"
+      # password: alta3      # pass as hash
+      state: present
+      shell: /bin/bash       # Defaults to /bin/bash
+      system: no             # Defaults to no
+      createhome: yes        # Defaults to yes
+      # home: /home/exampleuser  # Defaults to /home/<username>
+      group: sandbox
+    become: yes            
+

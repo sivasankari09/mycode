@@ -1,0 +1,22 @@
+---
+- name: bootstrapping and new user    # metadata (just a name)
+  hosts: raiders        # use the raiders group to connect
+  connection: ssh       # use openSSH to connect
+  gather_facts: False   # no need to audit targets
+
+  tasks:
+  # Remove the user 'exampleuser'
+  - name: remove a user
+    ansible.builtin.user:
+     name: exampleuser
+     state: absent
+     remove: yes
+    become: yes
+
+  # Remove the group 'sandbox'
+  - name: Remove the group sandbox
+    ansible.builtin.group:
+      name: sandbox
+      state: absent
+    become: yes
+
