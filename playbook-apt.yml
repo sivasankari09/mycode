@@ -1,0 +1,13 @@
+---
+- name: Playbook - Install figlet
+  hosts: planetexpress:!farnsworth
+  connection: ssh
+  gather_facts: yes
+
+  tasks:
+  - name: using apt to install figlet
+    ansible.builtin.apt:
+      name: figlet
+      state: present
+    become: yes
+    

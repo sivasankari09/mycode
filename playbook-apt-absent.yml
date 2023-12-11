@@ -1,0 +1,13 @@
+---
+- name: Playbook - uninstall figlet
+  hosts: planetexpress:!farnsworth
+  connection: ssh
+  gather_facts: yes
+
+  tasks:
+  - name: using apt to remove figlet
+    ansible.builtin.apt:
+      name: figlet
+      state: absent
+    become: yes
+    
