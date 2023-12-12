@@ -1,0 +1,16 @@
+- name: Working with simple dictionaries
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+  - name: Loop across complex data structures
+    ansible.builtin.debug:
+      msg: "{{ item.name }} belongs in the {{ item.groups }} aisle"
+    loop:
+      - { name: 'orange', groups: 'fruit' }
+      - { name: 'lemon', groups: 'fruit' }
+      - { name: 'cookie', groups: 'snack' }
+      - { name: 'carrot', groups: 'vegetable' }
+

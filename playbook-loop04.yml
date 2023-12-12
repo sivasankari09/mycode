@@ -1,0 +1,15 @@
+---
+ - name: Looping old-style with_items
+   hosts: localhost
+   connection: local  # default is ssh
+   gather_facts: no
+
+   tasks:
+    - name: "Learning about the debug module"
+      ansible.builtin.debug:
+        msg: "Debug module allows us to print to the screen --> {{ item }}"
+      with_items:
+      - "255.255.255.0"
+      - "192.168.0.1"
+      - "192.168.0.2"
+
