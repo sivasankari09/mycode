@@ -1,0 +1,33 @@
+---
+- name: copying from controller to hosts
+  hosts: planetexpress:!fransworth
+  connection: ssh
+  gather_facts: true
+
+  tasks:
+  - name: Create the new group of ipv4 access
+    ansible.builtin.group:
+      name: sysadmin
+      state: present
+    become: yes
+  - name: Create a sysadmin user for ipv4 access
+    ansible.builtin.user:
+      name: admin1
+      comment: "Example admin"
+      state: present
+      shell: /bin/bash
+      system: no
+      createhome: yes
+      group: sysadmin
+    become: yes
+  - name: Copy gather fact var data into hosts
+    ansible.builtin.copy:
+      content: "{{ ansible_all_ipv4_addresses }}"
+      dest: /host/admin1/ipv4info.tx
+      backup: yes
+      force: yes
+      owner: admin1
+      group: sysadmin
+      mode: '0644'
+    become: yes
+

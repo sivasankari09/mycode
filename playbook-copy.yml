@@ -1,0 +1,12 @@
+---
+-  name: Copying files from controller to hosts
+   hosts: planetexpress
+   connection: ssh
+   gather_facts: true
+
+   tasks:
+     - name: Copy Fry's resume to hosts
+       ansible.builtin.copy:
+          src: ~/mycode/files/fry.txt
+          dest: ~/fry.txt
+
