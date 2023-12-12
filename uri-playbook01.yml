@@ -1,0 +1,40 @@
+---
+- name: Get-URL Download the Protected File
+  hosts: localhost  # target ourselves
+  connection: local # we do not want to SSH anywhere. Run these actions locally
+  gather_facts: no  # no need to gather_facts about ourselves (defines ansible_facts)
+
+  tasks:
+    # in this task we alert Ansible to expect a 401 response
+    # the 'register' keyword saves the response sent back to the uri module
+    - name: Access the Website and make sure the URL is live
+      ansible.builtin.uri:
+        method: GET # send an HTTP GET to the location defined by param "url" (default)
+        url: http://10.10.2.4/admin/secure.txt
+        status_code: 401 # we expect a 401 failure
+        return_content: true
+      register: validateurl  # save the "response" (defines the var validateurl)
+
+    - name: "INFO: HTTP Response for the URL"
+      ansible.builtin.debug:   # the debug module prints to the screen
+              var: validateurl.msg
+
+    - name: Access the same URL with Basic Authentication and Download the file
+      ansible.builtin.uri:
+        method: GET
+        url: http://10.10.2.4/admin/secure.txt
+        status_code: 200 # this is the default, 200 means "success" in HTTP
+        return_content: yes
+        url_username: sammy  # this time include "sammy" as UN
+        url_password: larry  # this time include "larry" as PW      
+      register: validateurl  # overwrite the variable "validateurl"
+
+    - name: Show that the content was still retrieved
+      ansible.builtin.debug:
+              var: validateurl.content
+             
+    - name: Put secret content into a file
+      ansible.builtin.copy:
+        content: "{{ validateurl.content }}"
+        dest: ~/ansible-downloaded-the-secret-file.txt
+

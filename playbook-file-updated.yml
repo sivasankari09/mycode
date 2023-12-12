@@ -1,0 +1,22 @@
+---
+- name: A playbook showing the file module
+  hosts: planetexpress
+  connection: ssh   # use the connection plugin, ssh.py (this is the default)
+  gather_facts: no   # no need to define ansible_facts in this playbook
+
+  vars:
+    # the variable "st" is mapped to "directory"
+    st: absent # <--- This is the variable we need to edit.
+               # This will remove the file should it exist
+  tasks:
+  - name: "Create directory where Space Station documents will reside"
+    become_user: root
+    become: true
+    file:
+      path: "/home/{{ item }}/station_docs/"
+      state: "{{ st }}"
+      owner: "{{ item }}"
+      group: "{{ item }}"
+      mode: "0755"
+    loop: [fry, bender, zoidberg]
+

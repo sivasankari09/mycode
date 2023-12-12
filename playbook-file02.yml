@@ -1,0 +1,18 @@
+---
+- name: A playbook showing the file module
+  hosts: planetexpress
+  connection: ssh    # use the connection plugin, ssh.py (this is the default)
+  gather_facts: no   # no need to define ansible_facts in this playbook
+
+  tasks:
+   - name: "Create directory where Space Station documents will reside"
+     become_user: root
+     become: true
+     file:
+        # the var "fileuser" is a host variable and defined in ~/mycode/inv/dev/hosts
+        path: "/home/{{ fileuser }}/station_docs/"
+        state: directory
+        owner: "{{ fileuser }}"
+        group: "{{ fileuser }}"
+        mode: "0755"
+

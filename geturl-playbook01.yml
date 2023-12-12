@@ -1,0 +1,12 @@
+---
+- name: Getting files
+  hosts: planetexpress   # run against the entire planetexpress group
+  connection: ssh        # use the connection module, ssh.py (this is the default)
+  gather_facts: no       # do not run the module, setup.py, to define ansible_facts
+
+  tasks:
+  - name: "Download virus protection software to install on hosts"
+    ansible.builtin.get_url:
+      url: http://www.clamav.net/downloads/production/clamav-0.99.3.tar.gz
+      dest: ~/clamav-0.99.3.tar.gz
+
