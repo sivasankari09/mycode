@@ -1,0 +1,26 @@
+---
+- name: Template with a loop
+  hosts: fry
+  connection: ssh
+  gather_facts: no
+
+  # these variables are used in the template ship.cfg.j2
+  vars:
+    crew:
+      Zapp Brannigan:
+        description: ship captain, lots of medals
+        skills: leader, tactics, karaoke
+      Kif:
+        description: lieutenant
+        skills: devoted, quiet
+      Amy:
+        description: PhD
+        skills: engineering, physics, communication
+
+
+  tasks:
+    - name: Running a looping jinja template
+      template:  
+        src: templates/crew_report.txt.j2    # name of the template on ansible controller
+        dest: ~/crew_report.txt              # name of the completed file to be placed on the target system
+
