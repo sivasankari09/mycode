@@ -1,0 +1,14 @@
+---
+- name: Learning how to use git
+  hosts: planetexpress
+  connection: ssh
+  gather_facts: false
+
+  tasks:
+
+  - name: "Create a git archive from a repository"
+    git:
+        repo: https://github.com/ansible/ansible-examples.git  # this is the repo to be cloned
+        dest: ~/ansible-examples/            # clone to this location on the remote systems
+        archive: /tmp/ansible-examples.zip   # also place a copy of the archive in this location as a ZIP 
+
