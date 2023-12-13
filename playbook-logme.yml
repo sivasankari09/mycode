@@ -1,0 +1,16 @@
+---
+- name: Logging - Everything to standard out gets logged
+  hosts: localhost
+  connection: local # no need to ssh to ourselves
+  gather_facts: no
+
+  tasks:
+    - name: First debug
+      debug:
+        msg: "The first message in the playbook."   # this will NOT be logged
+      no_log: true   # this setting will PREVENT the task from being logged
+
+    - name: Second debug
+      debug:
+        msg: "The second message in the playbook."  # this WILL be logged
+

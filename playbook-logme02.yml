@@ -1,0 +1,20 @@
+---
+- name: Turn off logging at play level
+  hosts: localhost   # resolves to Ansible controller
+  connection: local  # no need to SSH anywhere
+  gather_facts: no   # no need to run setup.py (gather_facts) module
+  no_log: true      # uncomment this line to ensure no tasks are logged
+
+  tasks:
+      # API interactions often include login information or return sensitive data 
+      - name: Perform an API lookup (this may display sensitive data)
+        uri:
+            url: "https://api.le-systeme-solaire.net/rest/bodies/neso"
+            method: GET
+        register: results
+
+      # developers will often leave in debug tasks for future debugging
+      - name: Debug task left in by a developer for debugging
+        debug:
+            var: results
+
