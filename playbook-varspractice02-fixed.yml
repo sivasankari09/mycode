@@ -1,0 +1,15 @@
+---
+- name: Using a complex vars file
+  hosts: localhost
+  gather_facts: False
+
+  vars_files:
+    - ~/mycode/vars/titanvars.yml
+
+  tasks:
+  - name: debug with_dict
+    ansible.builtin.debug:
+      var: "{{ item }}"
+    loop: "{{ prefix_list|dict2items }}"   ## edit this line to include dict2items
+    ## the above is a jinja filter
+
