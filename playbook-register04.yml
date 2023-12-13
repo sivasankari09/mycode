@@ -1,0 +1,34 @@
+---              
+- name: Deploy mission critical app  
+  hosts: planetexpress
+  gather_facts: True
+  connection: ssh
+
+  tasks:
+  - name: Cowsay on Debian system (apt)
+    ansible.builtin.apt:
+      name: cowsay
+      state: present
+    become: yes
+    when: ansible_os_family == "Debian"
+    
+  - name: Cowsay on RedHat system (yum)
+    ansible.builtin.yum:
+      name: cowsay
+      state: present
+    become: yes
+    when: ansible_os_family == "RedHat"
+    
+  - name: Get all home directories across all systems
+    ansible.builtin.command: ls /home
+    become: yes
+    register: homevarz
+    
+  - name: Create a README.txt file if it does not exist in every home user directory
+    ansible.builtin.lineinfile:
+      create: yes
+      path: /home/{{ item }}/README.txt
+      line: "Type cowsay 'Moo, my good sir' for a funny display. Use CTRL + C to quit"
+    loop: "{{ homevarz.stdout_lines }}"
+    become: yes
+
