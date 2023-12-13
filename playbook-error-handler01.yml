@@ -1,0 +1,20 @@
+---
+- name: Learning about blocks
+  hosts: planetexpress
+  connection: ssh   # default connection type
+  gather_facts: no
+
+  tasks:
+
+  - name: BLOCK - This is what we want to TRY to do
+    block:
+
+      - name: Example task
+        shell: "echo 'My single task ran' > example.txt"
+
+      - name: Example task
+        shell: "echo 'My second task ran' >> example.txt"
+
+      - name: Example task
+        shell: "echo 'My third task ran' >> example.txt"
+

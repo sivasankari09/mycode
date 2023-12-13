@@ -1,0 +1,30 @@
+---
+- name: Learning about blocks
+  hosts: planetexpress
+  connection: ssh   # default connection type
+  gather_facts: no
+
+  tasks:
+
+  - name: BLOCK - This is what we want to TRY to do
+    block:
+
+      - name: Example task
+        shell: "echo 'My single task ran' > example.txt"
+
+      - name: Example task
+        shell: "echo 'My second task ran' >> example.txt"
+
+      - name: Example task
+        shell: "echo 'My third task ran' >> example.txt"
+
+    # this should only run IF we encounter a failure
+    rescue:
+      - name: Rescue task
+        shell: "echo 'My rescue code ran. Maybe it undoes whatever the block tried to do' >> example.txt"
+
+    # this should ALWAYS run (even if we had a failure in the rescue block!)
+    always:
+      - name: Always task
+        shell: "echo 'This always runs. Maybe it is a commit, or an entry in a log' >> example.txt"
+
