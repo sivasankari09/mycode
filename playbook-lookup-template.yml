@@ -1,0 +1,29 @@
+---
+- name: Using lookup plugin 'template'
+  connection: local
+  gather_facts: false
+  hosts: localhost
+
+  vars:
+      # Note that we have to have the following three variables defined for our template to be returned.
+      tftp_ip: "10.10.2.22"
+      src_cfg_filename: bob.txt
+      start_cfg_filename: alice.txt
+
+      # the lookup() template plugin can be used a rendered (finished) template to a variable
+      # This behavior is unlike the template MODULE which would then COPY the finished template
+      # to a target host
+      tftp_config: "{{ lookup('template', '~/mycode/templates/tftp.cfg.j2') }}"
+
+  tasks:
+          - name: Display the entire rentered config
+            debug:
+                    var: tftp_config
+
+          # using the lookup plugin to create a tftp_config var
+          # THEN write that var into a file with the copy module is basically the same as
+          # using the template module
+          - name: Write out our variable (rendered template) to a file
+            copy:
+                    content: "{{ tftp_config }}" # this was created by the lookup() plugin
+                    dest: ~/tftp.cfg             # this is the name of the file we created

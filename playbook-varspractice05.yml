@@ -1,0 +1,38 @@
+---
+- name: A playbook that manipulates data from uri
+  hosts: localhost
+
+  vars:
+    uritouse: "https://api-web.nhle.com/v1/player/8478402/game-log/now"
+
+  tasks:
+
+  - name: Use URI module to send HTTP GET
+    ansible.builtin.uri:
+      method: GET
+      url: "{{ uritouse }}"
+    register: results
+    tags:
+      - keys
+      - upper
+      - stringslice
+
+  - name: Use python to show all dictionary keys with python
+    ansible.builtin.debug:
+      var: results.keys()   # .keys() is a python dict method
+    tags:
+      - keys
+
+  - name: Loop across the teams and display the team locations made uppercase with python
+    ansible.builtin.debug:
+      var: item.playerStatsSeasonsplayerStatsSeasons.gameTypes.upper()  # .upper() is a python string method
+    loop: "{{ results.json.playerStatsSeasons }}"
+    tags:
+      - upper
+
+  # transform http://pittsburghpenguins.com/ into pittsburghpenguins.com
+  - name: Loop across the teams and write out a lite of URLs without the http:// or trailing /
+    shell: "echo {{ item.officialSiteUrl.lstrip('http:').rstrip('/').lstrip('//') }} >> /tmp/teamsites.txt"
+    loop: "{{ results.json.teams }}"
+    tags:
+      - stringslice
