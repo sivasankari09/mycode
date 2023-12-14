@@ -1,0 +1,72 @@
+---
+- name: Network Switch Config Saver
+  hosts: allvendors
+  gather_facts: yes
+
+  vars_files:
+    - ~/switch.creds
+
+  tasks:
+    # Ansible Date Time not available from eos/ios devices
+    # Therefore: We need to update ansible date/time 
+    #            from the controller
+    - name: update ansible date/time from local host
+      setup:
+        gather_subset:
+          - 'min'
+      connection: ansible.builtin.local    # change from network_cli to local for this task
+      run_once: true   # we don't want to run this task for as many switches as we have in the inventory. just once
+
+
+    - name: Gather EOS config only
+      eos_facts:
+        gather_subset:
+          - config
+      when: ansible_network_os == "eos"
+
+    - name: let's check out the EOS config
+      ansible.builtin.debug:
+        var: ansible_net_config
+
+    - name: Cisco IOS fact collection
+      ios_facts:
+        gather_subset:
+        - config
+      when: ansible_network_os == "ios"
+
+    - name: Cisco NXOS fact collection
+      nxos_facts:
+        gather_subset:
+        - config
+      when: ansible_network_os == "nxos"
+
+    - name: Juniper JunOS fact collection
+      junos_facts:
+        gather_subset:
+        - config
+      when: ansible_network_os == "junos"
+
+    - name: VyOS fact collection
+      vyos_facts:
+        gather_subset:
+        - config
+      when: ansible_network_os == "vyos"
+
+    - name: Create dir to save switch config backups
+      ansible.builtin.file:
+        path: ~/mycode/backup/{{ ansible_date_time.date }}/
+        state: directory
+      connection: ansible.builtin.local    # change from network_cli to local for this task
+      run_once: true   # we don't want to run this task for as many switches as we have in the inventory. just once
+
+    - name: Save out backed up configuration
+      ansible.builtin.copy:
+        content: "{{ ansible_net_config }}"
+        dest: "~/mycode/backup/{{ ansible_date_time.date }}/{{ inventory_hostname }}-config.backup"
+
+    - name: Archival process
+      archive:
+        path: "~/mycode/backup/{{ ansible_date_time.date }}/{{ inventory_hostname }}-config.backup"
+        remove: True     # removes the original file
+
+
