@@ -1,0 +1,17 @@
+- name: My Arista Playbook
+  hosts: switches
+  gather_facts: false
+
+  vars_files:
+    - ~/switch.creds
+
+  tasks:
+  - name: configure the login banner
+    eos_banner:
+      banner: login
+      text: |
+        Congrats! You set a banner using an Ansible EOS module.
+        Notice how YAML formatting lets us do multi-line
+        strings
+      state: "{{ herethere }}"
+
