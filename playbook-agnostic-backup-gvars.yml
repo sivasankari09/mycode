@@ -1,0 +1,28 @@
+---
+- name: backup all switch configs
+  hosts: eosswitches:iosswitches   # these two groups
+  gather_facts: false
+  become: yes # run the entire playbook as enable
+  connection: network_cli # required mode
+
+  # no vars section but we have our
+  # group vars that should be read into
+  # our playbook along with our inventory
+
+  tasks:
+
+    - name: pull backup from switches
+      cli_command:
+        command: "{{backup}}"
+      register: backup
+
+    - name: ensure backup directory is created
+      file:
+        path: ~/mycode/backup/
+        state: directory
+
+    - name: write out the backup to a file
+      copy:
+        content: "{{backup.stdout}}"
+        dest: "~/mycode/backup/{{inventory_hostname}}.backup"
+

@@ -1,0 +1,8 @@
+---
+backup: "show running-config"
+save: "write memory"
+ntp_commands: "ntp server 0.us.pool.ntp.org"
+ansible_become_method: enable
+ansible_user: cisco_admin
+ansible_ssh_pass: cisco_alta3
+

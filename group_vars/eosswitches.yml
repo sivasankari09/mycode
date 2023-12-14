@@ -1,0 +1,8 @@
+---
+backup: "show running-config"
+save: "copy running-config startup-config"
+ntp_commands: "ntp server 0.us.pool.ntp.org"
+ansible_become_method: enable
+ansible_user: admin
+ansible_ssh_pass: alta3
+
