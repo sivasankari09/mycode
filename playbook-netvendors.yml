@@ -1,0 +1,41 @@
+---
+- name: Network Commands by Vendor  
+  hosts: allvendors
+  gather_facts: no
+
+  vars_files:
+    - ~/switch.creds
+
+  tasks:
+    - name: Run Arista command
+      eos_command:
+        commands: show ip int br
+      when: ansible_network_os == 'eos'
+      register: eresult
+
+    - name: show eresult
+      debug:
+        var: eresult
+
+    - name: Run Cisco NXOS command
+      nxos_command:
+        commands: show ip int br
+      when: ansible_network_os == 'nxos'
+      register: nxresult
+      
+    - name: show nxresult
+      debug:
+        var: nxresult
+      when: ansible_network_os == 'nxos'
+
+    - name: Run Vyos command
+      vyos_command:
+        commands: show interface
+      when: ansible_network_os == 'vyos'
+      register: vresult
+
+    - name: show vresult
+      debug:
+        var: vresult
+      when: ansible_network_os == 'vyos'
+
