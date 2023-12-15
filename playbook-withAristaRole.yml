@@ -1,0 +1,20 @@
+---
+- name: Using the arista_backup role we created
+  hosts: all
+  connection: network_cli   # used to  connect to network devices
+  gather_facts: yes
+
+  vars:
+    ansible_network_os: eos
+
+  vars_files:
+    - ~/switch.creds
+
+  roles:
+    - arista_backup
+
+  tasks:
+    - name: print to the screen
+      debug:
+        msg: "the roles section will run before any tasks"
+
