@@ -1,0 +1,68 @@
+---
+- name: Create a session and token to use
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  # credentials for iDRAC
+  vars:
+    baseuri: 10.0.0.89
+    username: root
+    password: r0gerwilc0
+
+  collections:
+    community.general
+
+  tasks:
+  
+  - name: create session
+    community.general.redfish_command:
+      category: Sessions
+      command: CreateSession
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+  
+  - name: show results of the session
+    debug:
+        var: result
+  
+  - name: reflect on session and token information
+    pause:
+
+  # notice that we no longer are using a password and username combo
+  # instead we can use the token we tracked down
+  - name: get info using a token not a password and username
+    community.general.redfish_info:
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+    register: results
+
+  - name: show facts we retrieved with session token
+    debug:
+        var: result
+
+  - name: show results of the facts
+    pause:
+
+  - name: Set chassis indicator LED to blink using security token for auth
+    community.general.redfish_command:
+      category: Chassis
+      command: IndicatorLedBlink
+      resource_id: System.Embedded.1
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+
+  - name: appreciate that a light is now blinking in the Alta3 datacenter
+    pause:
+
+  # trash the token, we are done with it
+  - name: Delete the Session
+    community.general.redfish_command:
+       category: Sessions
+       command: DeleteSession
+       baseuri: "{{ baseuri }}"
+       auth_token: "{{ result.session.token }}"
+       session_uri: "{{ result.session.uri }}" 
+

@@ -1,0 +1,20 @@
+---
+- name: A playbook testing redfish command module
+  hosts: redfish
+  connection: local
+  gather_facts: true
+
+  collections:
+  - community.general
+
+  tasks:
+  - name: Clear Manager Logs with a timeout of 20 seconds
+    community.general.redfish_command:
+      category: Manager
+      command: ClearLogs
+      resource_id: BMC
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      timeout: 20
+
