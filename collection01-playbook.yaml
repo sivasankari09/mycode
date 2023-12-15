@@ -1,0 +1,15 @@
+---
+- name: use role distributed with collection
+  hosts: localhost # defined by inventory
+  connection: ssh  # default connection type
+  gather_facts: no # no need to collect ansible_facts
+
+  # this is the collection we want to make part of this playbook namespace
+  collections:
+  - adalovelace.myfirstcollection
+
+  tasks:
+  - name: Example of how to use a collection
+    debug:
+      msg: "Any new modules, roles, or other distributables included in the role would not be usable!"
+
