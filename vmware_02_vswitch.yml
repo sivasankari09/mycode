@@ -1,0 +1,22 @@
+---
+# Get info about vswitch configuration on a single ESXi host
+- name: Investigate vswitch configuration on a ESXi host
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+  
+  - name: Gather vswitch info about a single ESXi Host
+    community.vmware.vmware_vswitch_info:
+      validate_certs: false
+      hostname: 10.0.0.90   # ESXi hostname
+      username: root        # ESXi username
+      password: calvin23!   # ESXi password
+      esxi_hostname: 10.0.0.90  # required, repeat the ESXi IP or FQDN
+    register: all_vswitch_info
+
+  - name: Display results
+    debug:
+      var: all_vswitch_info
+

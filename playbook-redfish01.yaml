@@ -1,0 +1,26 @@
+---
+- name: A playbook to demo automating against RedFish APIs using community.general collection
+  hosts: redfish    # group name
+  connection: local      # we need to run HTTP(s) to talk to the RedFish APIs
+  gather_facts: true
+
+  collections:
+  - community.general 
+  
+  # vars for baseuri, username, and password have been imported from the inventory (hosts.yaml). 
+
+  tasks:
+
+        - name: Get CPU inventory
+          community.general.redfish_info:
+            category: Systems
+            command: GetCpuInventory
+            baseuri: "{{ baseuri }}"      # baseurl of OOB controller
+            username: "{{ username }}"    # un of OOB controller
+            password: "{{ password }}"    # pw of OOB controller
+          register: result
+
+        - name: Display the _info we just collected
+          debug:
+            msg: "{{ result.redfish_facts.cpu.entries }}"
+

@@ -1,0 +1,107 @@
+---
+# Get info about vswitch configuration on a single ESXi host
+- name: Investigate vswitch configuration on a ESXi host
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    vmname: test-vm-0001 # customize this
+
+  tasks:
+
+  - name: Try to lifecycle a virtual machine
+    block:
+
+    - name: Create a virtual machine on given ESXi hostname
+      community.vmware.vmware_guest:
+        validate_certs: false
+        hostname: 10.0.0.90
+        username: root
+        password: calvin23!
+        folder: /
+        name: "{{ vmname }}"
+        state: present  # poweredon # present # restarted # suspended
+        cdrom:
+          type: iso
+          iso_path: '[datastore1] ubuntu-18.04.6-live-server-amd64.iso'
+        guest_id: ubuntu64Guest   #centos64Guest
+        # This is hostname of particular ESXi server on which user wants VM to be deployed
+        #esxi_hostname: 10.0.0.90
+        disk:
+        - size_gb: 2
+          type: thin
+          datastore: datastore1
+        hardware:
+          memory_mb: 512
+          num_cpus: 4
+          scsi: paravirtual
+        networks:
+        - name: VM Network
+          mac: aa:bb:dd:aa:00:14
+          ip: 10.10.10.100
+          netmask: 255.255.255.0
+          device_type: vmxnet3
+        wait_for_ip_address: true
+        wait_for_ip_address_timeout: 600
+      delegate_to: localhost
+      register: deploy_vm
+
+    - name: display details of virtual machine
+      debug:
+        var: deploy_vm
+
+    - name: display name only
+      debug:
+        var: deploy_vm.instance.hw_name
+
+    - name: Your VM was correctly created
+      debug:
+        msg: "Your VM was created correctly! Waiting 1 minute before removing the VM"
+
+    - name: Pause for 1 minute
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Poweroff the virtual machine
+      community.vmware.vmware_guest:
+        validate_certs: false
+        hostname: 10.0.0.90
+        username: root
+        password: calvin23!
+        name: "{{ deploy_vm.instance.hw_name }}"
+        delete_from_inventory: True
+        state: poweredoff
+
+    - name: Remove a virtual machine from inventory
+      community.vmware.vmware_guest:
+        validate_certs: false
+        hostname: 10.0.0.90
+        username: root
+        password: calvin23!
+        name: "{{ deploy_vm.instance.hw_name }}"
+        delete_from_inventory: True
+        state: absent
+
+    rescue:
+    - name: Poweroff the virtual machine
+      community.vmware.vmware_guest:
+        folder: /
+        validate_certs: false
+        hostname: 10.0.0.90
+        username: root
+        password: calvin23!
+        name: "{{ deploy_vm.instance.hw_name }}"
+        delete_from_inventory: True
+        state: poweredoff
+
+    - name: Remove a virtual machine from inventory
+      community.vmware.vmware_guest:
+        folder: /
+        validate_certs: false
+        hostname: 10.0.0.90
+        username: root
+        password: calvin23!
+        name: "{{ deploy_vm.instance.hw_name }}"
+        delete_from_inventory: True
+        state: absent

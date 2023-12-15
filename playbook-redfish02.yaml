@@ -1,0 +1,37 @@
+---
+- name: A playbook to demo automating against RedFish APIs using community.general collection
+  hosts: redfish    # group name
+  connection: local      # we need to run HTTP(s) to talk to the RedFish APIs
+  gather_facts: true
+
+  collections:
+  - community.general      # to update / install, "ansible-galaxy collection install community.general"
+
+  tasks:
+
+    - name: Get CPU inventory
+      community.general.redfish_info:
+        category: Systems
+        command: GetCpuInventory
+        baseuri: "{{ baseuri }}"      # baseurl of OOB controller
+        username: "{{ username }}"    # un of OOB controller
+        password: "{{ password }}"    # pw of OOB controller
+      register: result
+
+    - name: Display the _info we just collected
+      debug:
+        var: result.redfish_facts.cpu.entries
+
+    - name: Write the info we just collected to a file
+      copy:
+        content: "{{ result.redfish_facts.cpu.entries }}"
+        dest: outputfile.json
+
+    - name: Restart system power gracefully
+      community.general.redfish_command:
+        category: Systems
+        command: PowerGracefulRestart
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+

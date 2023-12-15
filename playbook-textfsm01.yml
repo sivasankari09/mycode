@@ -1,0 +1,42 @@
+---
+- name: Testing with TextFSM
+  hosts: localhost
+
+  vars:
+    results:
+      stdout: "{{ lookup('file', '/home/student/mycode/files/cisco_ver.txt') }}"
+
+  tasks:
+  # pretend that these "results" just came back from a command like
+  # enable
+  # show version
+  #
+  - name: Display our results from the command "show version"
+    debug:
+      var: results.stdout
+
+  # there is data we want in that blob of text
+  # we can grab that data by passing our (predictable) text blob through
+  # a textfsm template (we would need to design this)
+  # creating the template can be very time consuming
+  # It also depends on you understanding regular expression
+  - name: Mimic parsing output with TextFSM
+    set_fact:
+      ciscofacts: "{{ results.stdout | parse_cli_textfsm('/home/student/mycode/files/cisco_ver_temp.txt') }}"
+
+
+  # display the "new" facts harvested by textfsm
+  # it might be more proper to say that our data
+  # has just become more easily accessible
+  - name: Show the new facts
+    debug:
+      var: ciscofacts
+
+  - name: Display the image
+    debug:
+      var: ciscofacts[0].ImageFile
+
+  - name: Display the memory
+    debug:
+      var: ciscofacts[0].Memory
+
