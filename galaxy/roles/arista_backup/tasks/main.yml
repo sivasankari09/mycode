@@ -1,0 +1,34 @@
+---
+# tasks file for /home/student/galaxy/roles/arista_backup
+# define current date
+- name: Arista EOS fact collection
+  eos_facts:
+    gather_subset: all  # IMPORTANT! Look at the Return values at the bottom of the eos_facts
+  when: ansible_network_os == "eos"
+  
+- name: get the current date
+  command: date "+%Y-%m-%d"
+  register: result
+  vars:
+    ansible_connection: local
+
+# set a fact to make things easier
+- name: set a variable to make date easier
+  set_fact:
+    date_now: "{{ result.stdout }}"          
+
+# build backup directory based on the current date
+- name: Create dir "{{ date_now }}" to save current switch config backups
+  file:
+    path: "~/mycode/backup/{{ date_now }}/"
+    state: directory    # Playbook will FAIL without this directory
+
+- name: Save out backed up configuration       
+  copy:
+    content: "{{ ansible_net_config }}"
+    dest: "~/mycode/backup/{{ date_now }}/{{ inventory_hostname }}-config.backup"
+
+- name: Archival process
+  archive:
+    path: "~/mycode/backup/{{ date_now }}/{{ inventory_hostname }}-config.backup"
+    remove: True     # removes the original file
