@@ -1,0 +1,25 @@
+---
+- name: Query Trivia API
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: "AMOUNT"
+      prompt: "Enter the amount of questions"
+      private: no
+    - name: "DIFFICULTY"
+      prompt: "Enter the difficulty (easy, medium, hard)"
+      private: no
+
+  tasks:
+    - name: Call custom API module
+      trivia_api:
+        amount: "{{ AMOUNT }}"
+        difficulty: "{{ DIFFICULTY }}"
+      register: api_result
+
+    - name: Display API response
+      debug:
+        msg: "{{ item['question'] }} Answer: {{ item['correct_answer'] }}"
+      loop: "{{ api_result.questions }}"
+
+
